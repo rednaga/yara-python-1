@@ -18,7 +18,7 @@ from distutils.command.build import build
 from distutils.command.build_ext import build_ext
 from setuptools import setup, Command, Extension
 from codecs import open
-
+from  setuptools.command import build_py
 import distutils.errors
 import distutils.ccompiler
 import distutils.sysconfig
@@ -29,6 +29,14 @@ import sys
 import tempfile
 import shutil
 import subprocess
+
+
+class BuildPyCommand(build_py.build_py):
+  """Custom build command."""
+
+  def run(self):
+    self.run_command('enable-dex')
+    build_py.build_py.run(self)
 
 
 OPTIONS = [
@@ -310,7 +318,9 @@ setup(
     cmdclass={
         'build': BuildCommand,
         'build_ext': BuildExtCommand,
-        'update': UpdateCommand},
+        'update': UpdateCommand,
+        'build_py': BuildPyCommand,
+    },
     ext_modules=[Extension(
         name='yara',
         include_dirs=['yara/libyara/include', 'yara/libyara/', '.'],
